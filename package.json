@@ -3,14 +3,14 @@
   "subdomain": "buildmypattern",
   "version": "0.0.0-0",
   "description": "Create colaborative UML Diagrams and obtain the source code",
-  "main": "server.js",
+  "main": "app.js",
   "domains": [
     "buildmypattern.com",
     "www.buildmypattern.com"
   ],
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,9 @@
     "passport-twitter": "*",
     "passport-facebook": "*",
     "connect-ensure-login": "*",
-    "mongoose": "*"
+    "mongoose": "*",
+    "jade": "*",
+    "stylus": "*"
   },
   "engines": {
     "node": "0.8.x"
