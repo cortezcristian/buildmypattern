@@ -1,5 +1,14 @@
-extends layout
+﻿extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  .row
+    .nine.columns
+      h1= title
+      p Welcome to #{title}, create colaborative UML Diagrams and obtain the source code.
+      #featured
+        img(src='./images/slide1.png', alt='slide image')
+        img(src='./images/slide2.png', alt='slide image')
+        img(src='./images/slide3.png', alt='slide image')
+
+    .three.columns
+      h2 Getting Started

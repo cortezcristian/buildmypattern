@@ -3,5 +3,35 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/foundation.min.css')
   body
+    // Nav Bar
+    .contain-to-grid  
+      nav.top-bar
+        ul
+          li.name
+            a(href='#')
+              img.logo(src='./images/logo-small.png', alt='Build my Pattern')
+          li.toggle-topbar
+            a(href='#')
+        section
+    
+        ul.right
+          li
+            a.anchorLink.active(href='/') Home
+          li
+            a.anchorLink(href='#about') About
+          li
+            a.anchorLink(data-reveal-id='user-login', href='#') Login
+        #user-login.reveal-modal
+          h2 Login
+          p
+            a(href='/auth/twitter') Sign in with Twitter
+          a.close-reveal-modal ×
+    // End Nav
     block content
+    //Included JS Files (Compressed) 
+    script(src='/javascripts/jquery.js')
+    script(src='/javascripts/foundation.min.js')
+    //Initialize JS Plugins 
+    script(src='/javascripts/app.js')
