@@ -25,8 +25,9 @@ html
             a.anchorLink(data-reveal-id='user-login', href='#') Login
         #user-login.reveal-modal
           h2 Login
-          p
-            a(href='/auth/twitter') Sign in with Twitter
+          p.con-login
+            a.btn-login.btn-twitter(href='/auth/twitter',alt='Sign in with Twitter') Sign in
+            a.btn-login.btn-facebook(href='/auth/facebook',alt='Sign in with Facebook') Sign in
           a.close-reveal-modal ×
     // End Nav
     block content
