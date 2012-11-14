@@ -66,20 +66,21 @@ passport.deserializeUser(function(obj, done) {
 * Express Configurations
 */
 app.configure(function(){
-  app.use(express.cookieParser());
-  app.use(express.session({ secret: 'keyboard cat' }));
-  app.use(passport.initialize());
-  app.use(passport.session());
   app.set('port', process.env.PORT || mainPort);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon(__dirname + '/public/favicon.ico'));
+  app.use(require('stylus').middleware(__dirname + '/public'));
+  app.use(express.static(path.join(__dirname, 'public')));
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  app.use(express.cookieParser());
+  app.use(express.session({ secret: 'keyboard cat' }));
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(app.router);
-  app.use(require('stylus').middleware(__dirname + '/public'));
-  app.use(express.static(path.join(__dirname, 'public')));
+  
   
 });
 
