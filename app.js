@@ -154,4 +154,8 @@ io.sockets.on('connection', function (socket) {
         console.log("classCreated");
         socket.broadcast.emit('classCreation', data);
     });
+	socket.on('classDragEnd', function (data) {
+        console.log("classDragEnd");
+        socket.broadcast.emit('classDrag', data);
+    });
 });

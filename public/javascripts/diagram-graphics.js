@@ -77,9 +77,18 @@ xUml.WIDTH = "";
 xUml.HEIGHT = "";
 
 /**
-* Global Gradient Objects Mixin
+* Global Gradient / Shadows Objects Mixin
 */
 xUml.gradients = {};
+xUml.shadows = {};
+xUml.shadows.global = function(){
+	return {
+		  color: 'black',
+		  blur: 1,
+		  offset: [0, 2],
+		  alpha: 0.3
+		};
+};
 xUml.gradients.dark = function(){
     //xUml.desktop.getContext()
     var grad = {
@@ -212,6 +221,7 @@ xUml.classBox = function(o){
       height: this.conf.height,
       cornerRadius: 5,
       fill: xUml.gradients.dark(),
+	  shadow: xUml.shadows.global(),
       stroke: "black",
       strokeWidth: 1,
       name: "box"
@@ -224,8 +234,11 @@ xUml.classBox = function(o){
     this.grp.on("dragstart", function() {
         this.moveToTop();
     });
-    this.grp.on("dragend", function() {
+    this.grp.on("dragend", function(d) {
+		xUml.log("=>",d)
+		xUml.log(this)
         this.moveToTop();
+		socket.emit('classDragEnd', { classConf: this });
     });
     return this.grp;
 }
@@ -245,7 +258,7 @@ xUml.optionssMenu = {
             var classNew = new xUml.classBox({title: "sample", rectX:220});
             xUml.desktop.add(classNew);
             xUml.desktop.draw();
-            console.log(classNew);
+            xUml.log(classNew);
             socket.emit('classCreated', { classConf: classNew.conf });
         }
     },{
@@ -268,7 +281,7 @@ xUml.buildMainMenu = function(){
          sMenu = xUml.optionssMenu;
    
     for(var i=0; i<sMenu.items.length;i++){
-        console.log(sMenu.items[i].label);
+        xUml.log(sMenu.items[i].label);
         var itemBox = new Kinetic.Rect({
           x: 0,
           y: 10,
@@ -276,8 +289,9 @@ xUml.buildMainMenu = function(){
 		  cornerRadius: 5,
           height: itemH,
           fill: xUml.gradients.dark(),
+		  shadow: xUml.shadows.global(),
           stroke: "#000",
-          strokeWidth: 1,
+          strokeWidth: 0.4,
           name: 'box-'+sMenu.items[i].name
         });
         var itemMenuLabel = new Kinetic.Text({
@@ -342,7 +356,7 @@ xUml.mainBar = function(){
       height: xUml.HEIGHT,
       fill: grd,
       stroke: "#fff",
-      strokeWidth: 1,
+      strokeWidth: 0.1,
       name: "topBar"
     });
     
@@ -372,7 +386,7 @@ xUml.mainBar = function(){
 
     var mainMenu = xUml.buildMainMenu();
 
-    // console.log(mainMenu);
+    // xUml.log(mainMenu);
 
     this.bar.add(box);
     this.bar.add(mainMenu);
@@ -410,9 +424,21 @@ window.onload = function() {
 */
 
 socket.on('classCreation', function (data) {
-        console.log("Class drawn");
+        xUml.log("Class drawn");
         var classBox = new xUml.classBox(data.classConf);
         xUml.desktop.add(classBox);
         xUml.desktop.draw();
+}); 
+
+socket.on('classDrag', function (data) {
+        xUml.log("Class drag");
+		var config = $.parseJSON(data.classConf);
+        // xUml.log("nuevoValor",config.attrs.x);//data.classConf.name
+		// xUml.log("antes=>",xUml.desktop.get("."+config.attrs.name)[0].attrs.x);
+		xUml.desktop.get("."+config.attrs.name)[0].attrs.x = config.attrs.x;
+		xUml.desktop.get("."+config.attrs.name)[0].attrs.y = config.attrs.y;
+		// xUml.log("dsp=>",xUml.desktop.get("."+config.attrs.name)[0].attrs.x);
+		// xUml.desktop.get("."+data.classConf.name)[0].attrs = classConf;
+		xUml.desktop.draw();
 }); 
 

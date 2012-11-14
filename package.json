@@ -1,7 +1,7 @@
 {
   "name": "buildmypattern.com",
   "subdomain": "buildmypattern",
-  "version": "0.0.0-8",
+  "version": "0.0.0-9",
   "description": "Create colaborative UML Diagrams and obtain the source code",
   "main": "app.js",
   "domains": [
