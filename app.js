@@ -24,7 +24,8 @@ var express = require('express')
   , FACEBOOK_APP_SECRET = "b86cdccb8a36ba141011fd5f5f4588cd"
   , TwitterStrategy = require('passport-twitter').Strategy
   , FacebookStrategy = require('passport-facebook').Strategy
-  , ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
+  , ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn
+  , SMserver = mainDomain;
   
 switch(process.env.NODE_ENV){
 	case 'development':
@@ -34,8 +35,11 @@ switch(process.env.NODE_ENV){
 		dbName = 'buildmypattern_dev';
 		dbUser = null;
 		dbPass = null;
+		SMserver = mainDomain+":"+mainPort;
 	break;
 	case 'production':
+		mainDomain = "buildmypattern.com";
+		SMserver = mainDomain;
 	break;
 	default:
 		if(typeof process.env.NODE_ENV == 'undefined'){
@@ -45,11 +49,13 @@ switch(process.env.NODE_ENV){
 			dbName = 'buildmypattern_dev';
 			dbUser = null;
 			dbPass = null;
-			process.env.NODE_ENV = 'development'
+			SMserver = mainDomain+":"+mainPort;
+			process.env.NODE_ENV = 'development';
 		}
 	break;
 }
 console.log('Environment set to:'+process.env.NODE_ENV);
+console.log('http://'+mainDomain+':'+mainPort+'/');
 var app = express();
 /**
 * Session support
@@ -100,7 +106,7 @@ app.get('/users', user.list);
 passport.use(new TwitterStrategy({
     consumerKey: TWITTER_CONSUMER_KEY,
     consumerSecret: TWITTER_CONSUMER_SECRET,
-    callbackURL: "http://"+mainDomain+":"+mainPort+"/auth/twitter/callback"
+    callbackURL: "http://"+SMserver+"/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
     var user = profile;
@@ -110,7 +116,7 @@ passport.use(new TwitterStrategy({
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "http://"+mainDomain+":"+mainPort+"/auth/facebook/callback"
+    callbackURL: "http://"+SMserver+"/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
 	var user = profile;
