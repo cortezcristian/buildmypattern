@@ -7,6 +7,7 @@ var express = require('express')
   //routes
   , routes = require('./routes')
   , user = require('./routes/user')
+  , diagramRoute = require('./routes/diagram')
   // modules
   , http = require('http')
   , path = require('path')
@@ -99,7 +100,7 @@ app.configure('development', function(){
 */
 app.get('/', routes.index);
 app.get('/users', user.list);
-
+app.get('/diagram', /*ensureLoggedIn('/login'),*/ diagramRoute.edit);
 /**
 * Social Media Auth
 */

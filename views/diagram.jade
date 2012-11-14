@@ -1,0 +1,31 @@
+﻿extends layout
+
+block scripts
+  script(src='/socket.io/socket.io.js')
+  script
+    var socket = io.connect('http://'+window.location.host);
+    socket.on('classCreated', function (data) {
+      alert("Class Created");
+    }); 
+    
+  script(src='/javascripts/kinetic-v4.0.5.min.js')
+  script(src='/javascripts/schema-graphics.js')
+
+block content
+  .contain-to-grid
+    .nine.columns
+      h2= title
+      dl.tabs
+        dd.active
+          a(href='#simple1') Diagram
+        dd
+          a(href='#simple2') Code
+      
+      ul.tabs-content
+        li#simple1Tab.active
+          #graph-container
+        li#simple2Tab This is simple tab 2
+      
+
+    .three.columns
+      h2 Users Connected
