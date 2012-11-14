@@ -12,6 +12,11 @@ html
           li.name
             a(href='#')
               img.logo(src='./images/logo-small.png', alt='Build my Pattern')
+          - if (typeof user != 'undefined')
+            li.user-name
+              | Welcome 
+              em #{user.username}
+
           li.toggle-topbar
             a(href='#')
         section
@@ -21,8 +26,15 @@ html
             a.anchorLink.active(href='/') Home
           li
             a.anchorLink(href='#about') About
-          li
-            a.anchorLink(data-reveal-id='user-login', href='#') Login
+          - if (typeof user != 'undefined')
+            li
+              a.anchorLink(href='/panel') Panel
+            li
+              a.anchorLink(href='/logout') Logout
+          - else
+            li
+              a.anchorLink(data-reveal-id='user-login', href='/login') Login
+
         #user-login.reveal-modal
           h2 Login
           p.con-login

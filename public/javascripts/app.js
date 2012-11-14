@@ -35,6 +35,13 @@
     });
   }
   
-  $("#featured").orbit();
+  $('#featured').orbit();
+  
+  /**
+  * Social Buttons Connect
+  */
+  $('.btn-login').live('click', function(){
+	$('.con-login').html('<img src="./images/preload.gif" alt="Loading" /><span>Please Wait...</span>');
+  })
 
 })(jQuery, this);
