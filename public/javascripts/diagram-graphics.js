@@ -190,7 +190,7 @@ xUml.classBox = function(o){
         name: this.conf.name,
         draggable: true
     });
-    
+
     var rectX = this.conf.rectX, rectY = this.conf.rectY;
     
     var txtTitle = new Kinetic.Text({
@@ -234,9 +234,7 @@ xUml.classBox = function(o){
     this.grp.on("dragstart", function() {
         this.moveToTop();
     });
-    this.grp.on("dragend", function(d) {
-		xUml.log("=>",d)
-		xUml.log(this)
+    this.grp.on("dragend", function(e) {
         this.moveToTop();
 		socket.emit('classDragEnd', { classConf: this });
     });
@@ -255,7 +253,7 @@ xUml.optionssMenu = {
         name: "application",
         icon: "./img/ico-applications.png",
         onClick: function(){
-            var classNew = new xUml.classBox({title: "sample", rectX:220});
+            var classNew = new xUml.classBox({name:'class'+new Date().getTime()+Math.floor(Math.random()*101),title: "sample", rectX:220});
             xUml.desktop.add(classNew);
             xUml.desktop.draw();
             xUml.log(classNew);
