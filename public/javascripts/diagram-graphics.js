@@ -75,6 +75,27 @@ xUml.desktopBar = {};
 xUml.desktopCon = {};
 xUml.WIDTH = "";
 xUml.HEIGHT = "";
+xUml.classes = [];
+xUml.relations = [];
+
+/**
+* Selection
+*/
+xUml.selection = {};
+xUml.selection.mode = {
+	on: false,
+	step: 0
+};
+xUml.selection.data = {
+	from: '',
+	to: ''
+};
+xUml.selection.start = function(){
+	xUml.selection.mode.on = true;
+}
+xUml.selection.stop = function(){
+	xUml.selection.mode.on = false;
+}
 
 /**
 * Global Gradient / Shadows Objects Mixin
@@ -134,6 +155,7 @@ xUml.gradients.orange = function(){
       };
     return grad;
 }
+
 /**
 * Init Method
 */
@@ -169,6 +191,7 @@ xUml.init = function(o){
     xUml.desktopCon  = new Kinetic.Layer({x:60}); /*Desktop container*/
     xUml.desktopBar  = new Kinetic.Layer();
 }
+
 /**
 * Class Box
 */
@@ -176,26 +199,28 @@ xUml.classBox = function(o){
     this.conf = {
         name: "class-name",
         title: "Class Name",
-        rectX: 50,
-        rectY: 20,
+        rectX: 0,
+        rectY: 0,
         width: 150,
         height: 100
     };
     
     xUml.override(this.conf, o || {});
 
+	var rectX = this.conf.rectX, rectY = this.conf.rectY;
+		
     this.grp = new Kinetic.Group({
-        x: 0,
-        y: 0,
+        x: rectX,
+        y: rectY,
+		stroke: "red",
+		strokeWidth: 1,
         name: this.conf.name,
         draggable: true
     });
-
-    var rectX = this.conf.rectX, rectY = this.conf.rectY;
     
     var txtTitle = new Kinetic.Text({
-        x: rectX + 7,
-        y: rectY + 3,
+        x: 7,
+        y: 3,
         text: this.conf.title,
         alpha: 0.9,
         fontSize: 12,
@@ -207,7 +232,7 @@ xUml.classBox = function(o){
         fontStyle: "bold"
     });
     var sepLine = new Kinetic.Line({
-        points: [{x:rectX+0,y:rectY+30},{x:rectX+this.conf.width,y:rectY+30}],
+        points: [{x:0,y:30},{x:this.conf.width,y:30}],
         stroke: "#333",
         strokeWidth: 1,
         lineCap: 'round',
@@ -215,8 +240,8 @@ xUml.classBox = function(o){
         name: "sepLine"
     });
     var box = new Kinetic.Rect({
-      x: rectX,
-      y: rectY,
+      x: 0,
+      y: 0,
       width: this.conf.width,
       height: this.conf.height,
       cornerRadius: 5,
@@ -231,7 +256,31 @@ xUml.classBox = function(o){
     this.grp.add(sepLine);
     this.grp.add(txtTitle);
     this.grp.conf = this.conf;
-    this.grp.on("dragstart", function() {
+    this.grp.on("click", function() {
+        // this.moveToTop();
+		if(xUml.selection.mode.on){
+			switch(xUml.selection.mode.step){
+				case 0:
+					console.log('Clicked'+this.attrs.name);
+					/* First selection */
+					xUml.selection.mode.step = 1;
+					xUml.selection.data.from = this.attrs.name;
+				break;
+				case 1:
+					console.log('Clicked'+this.attrs.name);
+					if(xUml.selection.data.from != this.attrs.name){
+						xUml.selection.mode.step = 0;
+						xUml.selection.data.to = this.attrs.name;
+						xUml.relArrow();
+						xUml.selection.stop();
+					}
+				break;
+				default:
+					console.log('Clicked'+this.attrs.name);
+			}
+		}
+    });
+	this.grp.on("dragstart", function() {
         this.moveToTop();
     });
     this.grp.on("dragend", function(e) {
@@ -240,6 +289,39 @@ xUml.classBox = function(o){
     });
     return this.grp;
 }
+
+/**
+* Arrow
+*/
+xUml.relArrow = function(nameFrom,nameTo){
+	var nFrom = nameFrom || xUml.selection.data.from,
+	nTo = nameTo || xUml.selection.data.to,
+	grpFrom = xUml.desktop.get("."+nFrom)[0],
+	grpTo = xUml.desktop.get("."+nTo)[0],
+	boxFrom = grpFrom.children[0].attrs,
+	boxTo = grpTo.children[0].attrs,
+	xStart = 0, yStart = 0, xEnd = 0, yEnd = 0;
+	// console.log(xUml.desktop.get("."+nFrom)[0]);
+	console.log(xUml.desktop.get("."+nFrom)[0].children[0].attrs);
+	console.log(xUml.desktop.get("."+nTo)[0].children[0].attrs);
+	
+	xStart = grpFrom.attrs.x + boxFrom.width;
+	yStart = grpFrom.attrs.y + Math.round(boxFrom.height/2);
+	xEnd = grpTo.attrs.x;
+	yEnd = grpTo.attrs.y + Math.round(boxTo.height/2);
+	
+	console.log([xStart, yStart, xEnd, yEnd]);
+	//Depends on position but...
+	var line = new Kinetic.Line({
+		points: [xStart, yStart, xEnd, yEnd],
+		stroke: "black",
+		strokeWidth: 2,
+		lineJoin: "round"
+	});
+	xUml.desktop.add(line);
+    xUml.desktop.draw();
+}
+
 /**
 * Menu for Main Bar
 */
@@ -253,7 +335,11 @@ xUml.optionssMenu = {
         name: "application",
         icon: "./img/ico-applications.png",
         onClick: function(){
-            var classNew = new xUml.classBox({name:'class'+new Date().getTime()+Math.floor(Math.random()*101),title: "sample", rectX:220});
+            var classNew = new xUml.classBox({
+				title: "sample X",
+				name:'class'+new Date().getTime()+Math.floor(Math.random()*101),
+				rectX : 120
+			});
             xUml.desktop.add(classNew);
             xUml.desktop.draw();
             xUml.log(classNew);
@@ -263,7 +349,9 @@ xUml.optionssMenu = {
         label:"Relation",
         name: "game",
         icon: "./img/ico-games.png",
-        onClick: function(){}
+        onClick: function(){
+			xUml.selection.start();
+		}
     },{
         label:"About",
         name: "about",
