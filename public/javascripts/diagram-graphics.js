@@ -328,6 +328,11 @@ xUml.classBox = function(o){
 	this.grp.on("dragstart", function() {
         this.moveToTop();
     });
+	
+	this.grp.on("dragmove", function() {
+        xUml.relDraw();
+    });
+	
     this.grp.on("dragend", function(e) {
         this.moveToTop();
 		xUml.relDraw();
