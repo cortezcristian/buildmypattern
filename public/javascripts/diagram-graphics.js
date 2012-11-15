@@ -186,10 +186,37 @@ xUml.init = function(o){
 	  fill: xUml.gradients.blue()
 	});
 	
+	var d = new Date(),
+    h = (d.getHours() < 10 ? '0' + d.getHours() : d.getHours()),
+    m = (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes()),
+    s = (d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds()),
+    da = (d.getDate() < 10 ? '0' + d.getDate() : d.getDate()),
+    mo = (d.getMonth() < 10 ? '0' + (d.getMonth() + 1): d.getMonth()),
+    text = d.toString().substring(0,3) + ' ' + da + ' ' + d.toString().substring(4,7) + ', ' + h + ':' + m + ':' + s ;
+    
+    
+    var clockLabel = new Kinetic.Text({
+        x: xUml.WIDTH - 150,
+        y: xUml.HEIGHT - 40,
+        text: text,
+        alpha: 0.9,
+        fontSize: 10,
+        fontFamily: "Arial",
+        textFill: "#d1d1d1",
+        padding: 15,
+        align: "left",
+        verticalAlign: "middle",
+        name: "mainClock",
+        fontStyle: "normal"
+    });
+	
     xUml.desktop  = new Kinetic.Layer({x:0});
 	xUml.desktop.add(xUml.desktopBg);
+	xUml.desktop.add(clockLabel);
     xUml.desktopCon  = new Kinetic.Layer({x:60}); /*Desktop container*/
     xUml.desktopBar  = new Kinetic.Layer();
+	//init apps
+	xUml.apps.init();
 }
 
 /**
@@ -305,10 +332,48 @@ xUml.relArrow = function(nameFrom,nameTo){
 	console.log(xUml.desktop.get("."+nFrom)[0].children[0].attrs);
 	console.log(xUml.desktop.get("."+nTo)[0].children[0].attrs);
 	
-	xStart = grpFrom.attrs.x + boxFrom.width;
-	yStart = grpFrom.attrs.y + Math.round(boxFrom.height/2);
-	xEnd = grpTo.attrs.x;
-	yEnd = grpTo.attrs.y + Math.round(boxTo.height/2);
+	if(grpFrom.attrs.x <= grpTo.attrs.x){ // F -> T
+		// console.log(((grpFrom.attrs.x + boxFrom.width) <= (grpTo.attrs.x + Math.round(boxTo.width/2))));
+		console.log((grpFrom.attrs.x + boxFrom.width) <= (grpTo.attrs.x + boxTo.width));
+		if((grpFrom.attrs.x + boxFrom.width) <= grpTo.attrs.x){// Pm1 = Xo + Wo/2
+			xStart = grpFrom.attrs.x + boxFrom.width;
+			yStart = grpFrom.attrs.y + Math.round(boxFrom.height/2);
+			xEnd = grpTo.attrs.x;
+			yEnd = grpTo.attrs.y + Math.round(boxTo.height/2);
+		}else{ //too close
+			if(grpFrom.attrs.y < grpTo.attrs.y){ // bottom To
+				xStart = grpFrom.attrs.x + Math.round(boxFrom.width/2);
+				yStart = grpFrom.attrs.y + boxFrom.height;
+				xEnd = grpTo.attrs.x + Math.round(boxTo.width/2);
+				yEnd = grpTo.attrs.y;
+			}else{ // bottom From
+				xStart = grpFrom.attrs.x + Math.round(boxFrom.width/2);
+				yStart = grpFrom.attrs.y;
+				xEnd = grpTo.attrs.x + Math.round(boxTo.width/2);
+				yEnd = grpTo.attrs.y + boxTo.height;
+			}
+		}
+	}else if (grpFrom.attrs.x > grpTo.attrs.x) { // T <- F
+		console.log(grpFrom.attrs.x >= (grpTo.attrs.x + Math.round(boxTo.width/2)));
+		if(grpFrom.attrs.x >= (grpTo.attrs.x + boxTo.width)){
+			xStart = grpFrom.attrs.x;
+			yStart = grpFrom.attrs.y + Math.round(boxFrom.height/2);
+			xEnd = grpTo.attrs.x + boxTo.width;
+			yEnd = grpTo.attrs.y + Math.round(boxTo.height/2);
+		}else{
+			if(grpFrom.attrs.y <= grpTo.attrs.y){ // bottom To
+				xStart = grpFrom.attrs.x + Math.round(boxFrom.width/2);
+				yStart = grpFrom.attrs.y + boxFrom.height;
+				xEnd = grpTo.attrs.x + Math.round(boxTo.width/2);
+				yEnd = grpTo.attrs.y;
+			}else{ // bottom From
+				xStart = grpFrom.attrs.x + Math.round(boxFrom.width/2);
+				yStart = grpFrom.attrs.y;
+				xEnd = grpTo.attrs.x + Math.round(boxTo.width/2);
+				yEnd = grpTo.attrs.y + boxTo.height;
+			}
+		}
+	}
 	
 	console.log([xStart, yStart, xEnd, yEnd]);
 	//Depends on position but...
@@ -445,30 +510,6 @@ xUml.mainBar = function(){
       strokeWidth: 0.1,
       name: "topBar"
     });
-    
-    var d = new Date(),
-    h = (d.getHours() < 10 ? '0' + d.getHours() : d.getHours()),
-    m = (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes()),
-    s = (d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds()),
-    da = (d.getDate() < 10 ? '0' + d.getDate() : d.getDate()),
-    mo = (d.getMonth() < 10 ? '0' + (d.getMonth() + 1): d.getMonth()),
-    text = d.toString().substring(0,3) + ' ' + da + ' ' + d.toString().substring(4,7) + ', ' + h + ':' + m + ':' + s ;
-    
-    
-    var clockLabel = new Kinetic.Text({
-        x: window.innerWidth - 150,
-        y: 15,
-        text: text,
-        alpha: 0.9,
-        fontSize: 10,
-        fontFamily: "Arial",
-        textFill: "#d1d1d1",
-        padding: 15,
-        align: "left",
-        verticalAlign: "middle",
-        name: "mainClock",
-        fontStyle: "normal"
-    });
 
     var mainMenu = xUml.buildMainMenu();
 
@@ -480,6 +521,31 @@ xUml.mainBar = function(){
     return this.bar;
 }
 
+/**
+* Applications
+*/
+//Namespace for apps
+xUml.apps = {};
+
+xUml.apps.init = function(){
+	xUml.apps.clock();
+};
+
+xUml.apps.clock = function(name){
+	setInterval(function(){
+	var d = new Date(),
+	h = (d.getHours() < 10 ? '0' + d.getHours() : d.getHours()),
+	m = (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes()),
+	s = (d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds()),
+	da = (d.getDate() < 10 ? '0' + d.getDate() : d.getDate()),
+	mo = (d.getMonth() < 10 ? '0' + (d.getMonth() + 1): d.getMonth()),
+	text = d.toString().substring(0,3) + ' ' + da + ' ' + d.toString().substring(4,7) + ', ' + h + ':' + m + ':' + s ;
+	//text = da + '-' + mo + '-' + d.getFullYear() + '   ' + h + ':' + m + ':' + s ;
+	
+	xUml.desktop.get(".mainClock")[0].setText(text);
+	xUml.desktop.draw();
+	},1000);
+}
 
 /**
 * Renderer Method
