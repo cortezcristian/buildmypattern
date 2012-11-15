@@ -312,11 +312,13 @@ xUml.classBox = function(o){
 					if(xUml.selection.data.from != this.attrs.name){
 						xUml.selection.mode.step = 0;
 						xUml.selection.data.to = this.attrs.name;
-						xUml.relations.push({
+						var dataConf = {
 							from : xUml.selection.data.from,
 							to : xUml.selection.data.to
-						});
+						};
+						xUml.relations.push(dataConf);
 						xUml.relArrow();
+						socket.emit('relCreated', { conf: dataConf });
 						xUml.selection.stop();
 					}
 				break;
@@ -601,21 +603,25 @@ window.onload = function() {
 */
 
 socket.on('classCreation', function (data) {
-        xUml.log("Class drawn");
-        var classBox = new xUml.classBox(data.classConf);
-        xUml.desktop.add(classBox);
-        xUml.desktop.draw();
-}); 
+	xUml.log("Class drawn");
+	var classBox = new xUml.classBox(data.classConf);
+	xUml.desktop.add(classBox);
+	xUml.desktop.draw();
+});
+
+socket.on('relCreation', function (data) {
+	xUml.log("Relation created");
+	xUml.relations.push(data.conf);
+	xUml.relDraw();
+	// xUml.relArrow(data.conf.from, data.conf.to);
+});
 
 socket.on('classDrag', function (data) {
-        xUml.log("Class drag");
-		var config = $.parseJSON(data.classConf);
-        // xUml.log("nuevoValor",config.attrs.x);//data.classConf.name
-		// xUml.log("antes=>",xUml.desktop.get("."+config.attrs.name)[0].attrs.x);
-		xUml.desktop.get("."+config.attrs.name)[0].attrs.x = config.attrs.x;
-		xUml.desktop.get("."+config.attrs.name)[0].attrs.y = config.attrs.y;
-		// xUml.log("dsp=>",xUml.desktop.get("."+config.attrs.name)[0].attrs.x);
-		// xUml.desktop.get("."+data.classConf.name)[0].attrs = classConf;
-		xUml.desktop.draw();
+	xUml.log("Class drag");
+	var config = $.parseJSON(data.classConf);
+	xUml.desktop.get("."+config.attrs.name)[0].attrs.x = config.attrs.x;
+	xUml.desktop.get("."+config.attrs.name)[0].attrs.y = config.attrs.y;
+	xUml.relDraw();
+	// xUml.desktop.draw();
 }); 
 

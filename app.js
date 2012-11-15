@@ -158,4 +158,8 @@ io.sockets.on('connection', function (socket) {
         console.log("classDragEnd");
         socket.broadcast.emit('classDrag', data);
     });
+	socket.on('relCreated', function (data) {
+        console.log("relCreated");
+        socket.broadcast.emit('relCreation', data);
+    });
 });
