@@ -78,6 +78,18 @@ xUml.HEIGHT = "";
 xUml.classes = [];
 xUml.relations = [];
 
+xUml.relDraw = function(){
+	//Remove Arrows
+	$.each(xUml.desktop.get(".arrow"), function(i,v){
+		v.remove();
+	});
+	// Rebuild relationships
+	$.each(xUml.relations, function(i,v){
+		console.log(xUml.relations[i].from, xUml.relations[i].to);
+		xUml.relArrow(xUml.relations[i].from, xUml.relations[i].to);
+	});
+};
+
 /**
 * Selection
 */
@@ -95,6 +107,8 @@ xUml.selection.start = function(){
 }
 xUml.selection.stop = function(){
 	xUml.selection.mode.on = false;
+	xUml.selection.data.from = "";
+	xUml.selection.data.to = "";
 }
 
 /**
@@ -298,6 +312,10 @@ xUml.classBox = function(o){
 					if(xUml.selection.data.from != this.attrs.name){
 						xUml.selection.mode.step = 0;
 						xUml.selection.data.to = this.attrs.name;
+						xUml.relations.push({
+							from : xUml.selection.data.from,
+							to : xUml.selection.data.to
+						});
 						xUml.relArrow();
 						xUml.selection.stop();
 					}
@@ -312,6 +330,7 @@ xUml.classBox = function(o){
     });
     this.grp.on("dragend", function(e) {
         this.moveToTop();
+		xUml.relDraw();
 		socket.emit('classDragEnd', { classConf: this });
     });
     return this.grp;
@@ -381,6 +400,7 @@ xUml.relArrow = function(nameFrom,nameTo){
 		points: [xStart, yStart, xEnd, yEnd],
 		stroke: "black",
 		strokeWidth: 2,
+		name: "arrow",
 		lineJoin: "round"
 	});
 	xUml.desktop.add(line);
